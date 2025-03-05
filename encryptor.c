@@ -19,9 +19,9 @@ void row_shift(char* byte_data, char* key, size_t key_s, int row){
 	byte_data[o_row_s + (2*4)] = temp[2];
 	byte_data[o_row_s + (3*4)] = temp[3];
 }
-void col_shift(char* byte_data, char* key, int col){
+void col_shift(char* byte_data, char* key,size_t key_s, int col){
 	int o_col_s = col * 4;
-	int n_col_s = 4 * (key[col] % 4);
+	int n_col_s = 4 * (key[col % key_s] % 4);
 	if (n_col_s == o_col_s){
 		n_col_s = (n_col_s + 4) % 16;
 	}
@@ -41,14 +41,14 @@ void col_shift(char* byte_data, char* key, int col){
 }
 void key_apply(char* byte_data, char key){
 	for (int i = 0; i < 16; i++){
-		byte_data[i] = (byte_data[i] + key * 11) % 256;
+		byte_data[i] = byte_data[i] ^ key;
 	}
 }
  //in place encryption, assumes 16 bytes of data
 void encrypt_data(char* byte_data, char* key, size_t k_len){
 	for (size_t i = 0; i < k_len; i++){
 		for (int i = 0; i < 4; i++){
-			col_shift(byte_data, key, i);
+			col_shift(byte_data, key, k_len, i);
 		}
 		for (int i = 0; i < 4; i++){
 			row_shift(byte_data, key, k_len, i);
