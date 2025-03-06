@@ -55,4 +55,4 @@ void encrypt_data(char* byte_data, char* key, size_t k_len){
 		}
 		key_apply(byte_data, key[i]);
 	}
-}
+}   
