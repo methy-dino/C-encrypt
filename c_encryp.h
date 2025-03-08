@@ -2,8 +2,12 @@
 #pragma once
 #include"encryptor.h"
 #include"decryptor.h"
-#include<stddef.h>
+#include<stdio.h>
+#include<stdlib.h>
 // can't encrypt in place due to chance of bad size
 char* batch_encrypt(char* str, size_t len, size_t* n_len, char* key, size_t key_l);
 // should always be a multiple of 16, it is a pair to batch_encrypt.
 void batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l);
+// creates an encrypted copy of the file pointed by the string, and returns the filepath of that encrypted copy, otherwise returns NULL
+char* encrypt_file(char* file, char* destination, char* key, size_t k_len);
+char* decrypt_file(char* file, char* destination, char* key, size_t k_len);
