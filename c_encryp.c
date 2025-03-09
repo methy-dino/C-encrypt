@@ -32,6 +32,11 @@ void batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l){
 }
 // creates an encrypted copy of the file pointed by the string, and returns the filepath of that encrypted copy, otherwise returns NULL
 char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
+	unsigned int seed = 0;
+	for (size_t i = 0; i < k_len; i++){
+		seed += key[i] * 11;
+	}
+	srand(seed);
 	FILE* target = fopen(file, "r");
 	if (target == NULL){
 		return NULL;
@@ -57,7 +62,8 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 	char fill = batch_i;
 	if (batch_i > 0){
 		while (batch_i < 16){
-			batch[batch_i] = '\0';
+			// fill with garbo data based on key, should kill many attempts to reverse engineer keys using a poorly occupied last batch, and it doesn't change the results!!! 
+			batch[batch_i] = rand() % 256;
 			batch_i++;
 		}
 		encrypt_data(batch, key, k_len);
@@ -68,7 +74,7 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 	fclose(enc_cp);
 	return destination;
 }
-char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
+char* decrypt_file(char* file, char* destination, char* key, size_t k_len){	
 	FILE* target = fopen(file, "r");
 	if (target == NULL){
 		return NULL;
