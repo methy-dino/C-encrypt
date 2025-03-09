@@ -54,7 +54,7 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		}
 	}
 	fclose(target);
-	if (batch_i != 16){
+	if (batch_i < 16){
 		while (batch_i < 16){
 			batch[batch_i] = '\0';
 			batch_i++;
@@ -70,12 +70,13 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 	if (target == NULL){
 		return NULL;
 	}
-	FILE* enc_cp = fopen(destination, "w+");
-    if (enc_cp == NULL){
+	FILE* dec_cp = fopen(destination, "w+");
+    if (dec_cp == NULL){
         fclose(target);
         return NULL;    
     }
-	char batch[16];
+	char batch[17];
+	batch[16] ='\0';
 	int curr;
 	char batch_i = 0;
 	while ((curr = fgetc(target)) != EOF){
@@ -84,18 +85,18 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 		if (batch_i == 16){
 			batch_i = 0;
 			decrypt_data(batch, key, k_len);
-			fwrite((void*)batch, 1, 16, enc_cp);
+			fputs(batch, dec_cp);
 		}
 	}
 	fclose(target);
-	if (batch_i != 16){
-		while (batch_i < 16){
-			batch[batch_i] = '\0';
-			batch_i++;
-		}
-		decrypt_data(batch, key, k_len);
-		fwrite((void*)batch, 1, 16, enc_cp);
-	}
-	fclose(enc_cp);
+	//if (batch_i != 16){
+		//while (batch_i < 16){
+			//batch[batch_i] = '\0';
+			//batch_i++;
+		//}
+		//decrypt_data(batch, key, k_len);
+		//fwrite((void*)batch, 1, 16, enc_cp);
+	//}
+	fclose(dec_cp);
 	return destination;
 }
