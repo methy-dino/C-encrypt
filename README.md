@@ -5,4 +5,4 @@ The library has two main functions, ```encrypt\_data```, and ```decrypt\_data```
 ### batch encryption.
 c_encryp has a batch encryption function, which encrypts any given string, padding it to have a length multiple of 16.
 ### file encryption.
-c_encryp has a function similar to batch encrypting, except it takes a file pathas a pointer and encrypts such file, writing the contents to a second file, pointed by another file path, currently it only has support to text files, but there are plans to make it able to encrypt any file type.
+c_encryp has a function similar to batch encrypting, except it takes a file pathas a pointer and encrypts such file, writing the contents to a second file, pointed by another file path, it supports any file type.

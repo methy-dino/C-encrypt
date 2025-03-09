@@ -54,6 +54,7 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		}
 	}
 	fclose(target);
+	char fill = batch_i;
 	if (batch_i > 0){
 		while (batch_i < 16){
 			batch[batch_i] = '\0';
@@ -62,6 +63,8 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		encrypt_data(batch, key, k_len);
 		fwrite((void*)batch, 1, 16, enc_cp);
 	}
+	// save how much filler was needed.
+	fwrite((void*)&fill, 1, 1, enc_cp);  
 	fclose(enc_cp);
 	return destination;
 }
@@ -83,9 +86,22 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 		batch[batch_i] = (char)curr;
 		batch_i++;
 		if (batch_i == 16){
-			batch_i = 0;
-			decrypt_data(batch, key, k_len);
-			fputs(batch, dec_cp);
+			// check if it's the last buffer batch.
+			curr = fgetc(target);
+			int temp = fgetc(target); 
+			if (temp == EOF){
+				// if so, then write only curr bytes to the file.
+				decrypt_data(batch, key, k_len);
+				fwrite(batch, 1, curr, dec_cp);
+				break;
+			} else {
+				// if not, then write all 16 bytes to the file.
+				batch_i = 2;
+				decrypt_data(batch, key, k_len);
+				fwrite(batch, 1, 16, dec_cp);
+				batch[0] = (char) curr;
+				batch[1] = (char) temp;
+			}
 		}
 	}
 	fclose(target);
