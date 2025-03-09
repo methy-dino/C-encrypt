@@ -59,8 +59,10 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		}
 	}
 	fclose(target);
-	char fill = batch_i;
+    // assume first to append 16 bytes, avoids an if. 
+	char fill = 16;
 	if (batch_i > 0){
+        fill = batch_i;
 		while (batch_i < 16){
 			// fill with garbo data based on key, should kill many attempts to reverse engineer keys using a poorly occupied last batch, and it doesn't change the results!!! 
 			batch[batch_i] = rand() % 256;
@@ -84,8 +86,7 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
         fclose(target);
         return NULL;    
     }
-	char batch[17];
-	batch[16] ='\0';
+	char batch[16];
 	int curr;
 	char batch_i = 0;
 	while ((curr = fgetc(target)) != EOF){
@@ -98,7 +99,7 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 			if (temp == EOF){
 				// if so, then write only curr bytes to the file.
 				decrypt_data(batch, key, k_len);
-				fwrite(batch, 1, curr, dec_cp);
+                fwrite(batch, 1, curr, dec_cp);    
 				break;
 			} else {
 				// if not, then write all 16 bytes to the file.
