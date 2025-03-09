@@ -54,7 +54,7 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		}
 	}
 	fclose(target);
-	if (batch_i < 16){
+	if (batch_i > 0){
 		while (batch_i < 16){
 			batch[batch_i] = '\0';
 			batch_i++;
@@ -89,7 +89,7 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 		}
 	}
 	fclose(target);
-	//if (batch_i != 16){
+	//if (batch_i > 0){
 		//while (batch_i < 16){
 			//batch[batch_i] = '\0';
 			//batch_i++;
