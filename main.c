@@ -27,8 +27,8 @@ int main(int argC, char** args){
     char big_key[8] = "Twitter!";
     size_t new_size = 0;
     char* encrypted = batch_encrypt(big_str, strlen(big_str), &new_size, big_key, 8);
-    batch_decrypt(encrypted, new_size, big_key, 8);
-    printf("batch: \"%s\"\n", encrypted);
+    char* decrypted = batch_decrypt(encrypted, new_size, big_key, 8);
+    printf("batch: \"%s\"\n", decrypted);
   } else {
     if (strcmp(args[1], "encrypt")==0){
      encrypt_file(args[2], args[3], args[4], strlen(args[4]));          

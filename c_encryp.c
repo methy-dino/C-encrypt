@@ -2,41 +2,67 @@
 #include"decryptor.h"
 #include<stdio.h>
 #include<stdlib.h>
-// can't encrypt in place due to chance of bad size
+// can't encrypt in place due to chance of bad size.
+/* ********** args **********  
+ *	char* str -> the bytes of the data to be encrypted.
+ *	size_t len -> the index of the data's last byte.
+ *	size_t* n_len -> variable to hold the length (index of fill indicator) after encryption.
+ *	char* key -> the key to the encryption.
+ *	size_t key_l -> length of the key's bytes.
+ * ********** returns **********
+ * char* -> encrypted data.
+ */
 char* batch_encrypt(char* str, size_t len, size_t* n_len, char* key, size_t key_l){
-    // +1 to grant space for null terminator
+    // +1 to grant space for fill indicator.
     //ceil((len+1) / 16) * 16;
-	n_len[0] = ((len + 16) / 16) * 16;
+		len++;
+	n_len[0] = ((len + 15) / 16) * 16;
     unsigned int seed = 0;
 	for (size_t i = 0; i < key_l; i++){
 		seed += key[i] * 11;
 	}
-    srand(seed);
-	char* encrypted = malloc(n_len[0]);
+  srand(seed);
+	char* encrypted = malloc(n_len[0]+1);
 	size_t i = 0;
 	while(i < len){
 		encrypted[i] = str[i];
 		i++;
 	}
-    encrypted[len] = '\0';
-    i++;
 	// garbage data for safety
+	char fill = (n_len[0] - i); 
 	while(i < n_len[0]){
 		encrypted[i] = rand() % 256;
 		i++;
-	} 
+	}
+	encrypted[n_len[0]] = fill;
 	for (size_t i = 0; i < n_len[0] / 16; i++){
 		// sets up a pointer to the current batch and sends it to encryption.
 		encrypt_data(&encrypted[i*16], key, key_l);
 	}
 	return encrypted;
 }
-// should always be a multiple of 16, it is a pair to batch_encrypt.
-void batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l){
+/* ********** args **********  
+ *	char* encrypted -> the bytes of the data to be decrypted.
+ *	size_t len -> the index of the data's last byte. (which is automatically written by batch_encrypt's size_t* n_len)
+ * 	size_t* o_len -> variable to hold the length (index of last byte) after decryption.
+ *	char* key -> the key to the decryption.
+ *	size_t key_l -> length of the key's bytes.
+ * ********** returns **********
+ * char* -> decrypted data.
+ * ********** warnings **********
+ * frees the memory block of encrypted automatically. 
+ */
+
+char* batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l){
 	for (size_t i = 0; i < len / 16; i++){
         decrypt_data(&encrypted[i*16], key, key_l);
 	}
-	// shrimple
+	char* decrypted = (char*) malloc(len - encrypted[len]);
+	for (size_t i = 0; i < len - encrypted[len]; i++){
+		decrypted[i] = encrypted[i];
+	}
+	free(encrypted);
+	return decrypted;
 }
 // creates an encrypted copy of the file pointed by the string, and returns the filepath of that encrypted copy, otherwise returns NULL
 char* encrypt_file(char* file, char* destination, char* key, size_t k_len){

@@ -4,10 +4,19 @@
 #include"decryptor.h"
 #include<stdio.h>
 #include<stdlib.h>
-// can't encrypt in place due to chance of bad size
+// can't encrypt in place due to chance of bad size.
+/* ********** args **********  
+ *	char* str -> the bytes of the data to be encrypted.
+ *	size_t len -> the index of the data's last byte.
+ *	size_t* n_len -> variable to hold the length (index of fill indicator) after encryption.
+ *	char* key -> the key to the encryption.
+ *	size_t key_l -> length of the key's bytes.
+ * ********** returns **********
+ * char* -> encrypted data.
+ */
 char* batch_encrypt(char* str, size_t len, size_t* n_len, char* key, size_t key_l);
-// should always be a multiple of 16, it is a pair to batch_encrypt.
-void batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l);
+// auto trim to batch_encrypt.
+char* batch_decrypt(char* encrypted, size_t len, char* key, size_t key_l);
 // creates an encrypted copy of the file pointed by the string, and returns the filepath of that encrypted copy, otherwise returns NULL
 char* encrypt_file(char* file, char* destination, char* key, size_t k_len);
 char* decrypt_file(char* file, char* destination, char* key, size_t k_len);
