@@ -6,12 +6,14 @@ void batch_encrypt(char* bytes, size_t len, char* key, size_t key_l){
 	for (size_t i = 0; i < (len / 16); i++){
 		encrypt_data(&bytes[i*16], key, key_l);
 	}
-	//encrypt_data(&bytes[len - 15], key, key_l);
+	encrypt_data(&bytes[len - 15], key, key_l);
+
 	//encrypt_data(&bytes[(len / 16 - 1) * 16], key, key_l);
 }
 void batch_decrypt(char* bytes, size_t len, char* key, size_t key_l){
 	//decrypt_data(&bytes[(len / 16 - 1) * 16], key, key_l);
-	//decrypt_data(&bytes[len - 15], key, key_l);
+	//bytes[len] = bytes[len] ^ bytes[key[0] % len];
+	decrypt_data(&bytes[len - 15], key, key_l);
 	for (size_t i = 0; i < len / 16; i++){
 		decrypt_data(&bytes[i*16], key, key_l);
 	}
