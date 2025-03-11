@@ -87,7 +87,8 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 	fread((void*) batch, 1, 16 + (max % 16), target);
 	encrypt_data(batch, key, k_len);
 	encrypt_data(&batch[16 + (max % 16) - 16], key, k_len);
-	fclose(target);
+    fwrite((void*)batch, 1,16 + (max % 16), enc_cp);	
+    fclose(target);
 	fclose(enc_cp);
 	return destination;
 }
@@ -114,6 +115,7 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
 	fread((void*) batch, 1, 16 + (max % 16), target);
 	decrypt_data(&batch[16 + (max % 16) - 16], key, k_len);
 	decrypt_data(batch, key, k_len);
+    fwrite((void*)batch, 1,16 + (max % 16), dec_cp);
 	fclose(target);
 	fclose(dec_cp);
 	return destination;
