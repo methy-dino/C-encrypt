@@ -25,9 +25,9 @@ int main(int argC, char** args){
 		printf("\" - \"%s\"\n", encode);
 		char big_str[] = "hello guys, and welcome back to my twitter thread!";
     char big_key[8] = "Twitter!";
-    size_t new_size = 0;
-    char* encrypted = batch_encrypt_cp(big_str, strlen(big_str), &new_size, big_key, 8);
-    char* decrypted = batch_decrypt_cp(encrypted, &new_size, big_key, 8);
+    size_t size = strlen(big_str);
+    char* encrypted = batch_encrypt_cp(big_str, strlen(big_str), big_key, 8);
+    char* decrypted = batch_decrypt_cp(encrypted, size, big_key, 8);
     printf("batch: \"%s\"\n", decrypted);
 		char test[] = "big monke is veeery big";
 		char test_key[] = "BiGmOnKe";
