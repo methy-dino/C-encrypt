@@ -87,11 +87,11 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 		seed += key[i] * 11;
 	}
 	srand(seed);
-	FILE* target = fopen(file, "r");
+	FILE* target = fopen(file, "rb");
 	if (target == NULL){
 		return NULL;
 	}
-	FILE* enc_cp = fopen(destination, "w+");
+	FILE* enc_cp = fopen(destination, "wb+");
     if (enc_cp == NULL){
         fclose(target);
         return NULL;    
@@ -127,11 +127,11 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
 	return destination;
 }
 char* decrypt_file(char* file, char* destination, char* key, size_t k_len){	
-	FILE* target = fopen(file, "r");
+	FILE* target = fopen(file, "rb");
 	if (target == NULL){
 		return NULL;
 	}
-	FILE* dec_cp = fopen(destination, "w+");
+	FILE* dec_cp = fopen(destination, "wb+");
     if (dec_cp == NULL){
         fclose(target);
         return NULL;    

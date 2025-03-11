@@ -26,9 +26,16 @@ int main(int argC, char** args){
 		char big_str[] = "hello guys, and welcome back to my twitter thread!";
     char big_key[8] = "Twitter!";
     size_t new_size = 0;
-    char* encrypted = batch_encrypt(big_str, strlen(big_str), &new_size, big_key, 8);
-    char* decrypted = batch_decrypt(encrypted, new_size, big_key, 8);
+    char* encrypted = batch_encrypt_cp(big_str, strlen(big_str), &new_size, big_key, 8);
+    char* decrypted = batch_decrypt_cp(encrypted, &new_size, big_key, 8);
     printf("batch: \"%s\"\n", decrypted);
+		char test[] = "big monke is veeery big";
+		char test_key[] = "BiGmOnKe";
+		size_t test_len = strlen(test); 
+		batch_encrypt(test, test_len, test_key, strlen(test_key));
+		printf("in-place: \"%d\"\n", test[strlen(test)]);
+		batch_decrypt(test, test_len, test_key, strlen(test_key));
+		printf("in-place: \"%s\"\n", test);
   } else {
     if (strcmp(args[1], "encrypt")==0){
      encrypt_file(args[2], args[3], args[4], strlen(args[4]));          
