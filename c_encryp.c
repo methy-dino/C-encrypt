@@ -29,8 +29,8 @@ void batch_decrypt(char* bytes, size_t len, char* key, size_t key_l){
  * char* -> encrypted data that can be written to a file and decoded by file_decrypt.
  */
 char* batch_encrypt_cp(char* str, size_t len, char* key, size_t key_l){
-    char* encrypted = malloc(len+1);
-    for (size_t i = 0; i < len+1; i++){
+ 	char* encrypted = malloc(len+1);
+  for (size_t i = 0; i < len+1; i++){
 		encrypted[i] = str[i];
 	}    
 	for (size_t i = 0; i < len / 16; i++){
@@ -75,20 +75,23 @@ char* encrypt_file(char* file, char* destination, char* key, size_t k_len){
   }
 	char batch_i = 0;
 	long max = f_len(file);
-	long batches = max - 16 - (max % 16);
-	char batch[16 + (max % 16)];
+	long batches = max - 8192 - 16;
+	char batch[8192];
 	long i = 0;
 	while (i < batches){
-			i += 16;
-			fread((void*) batch, 1, 16, target);
-			encrypt_data(batch, key, k_len);
-			fwrite((void*)batch, 1, 16, enc_cp);
+			i += fread((void*) batch, 1, 8192, target);
+			for (int i = 0; i < 512; i++){
+				encrypt_data(&batch[i*16], key, k_len);
+			}
+			fwrite((void*)batch, 1, 8192, enc_cp);
 	}
-	fread((void*) batch, 1, 16 + (max % 16), target);
-	encrypt_data(batch, key, k_len);
-	encrypt_data(&batch[16 + (max % 16) - 16], key, k_len);
-    fwrite((void*)batch, 1,16 + (max % 16), enc_cp);	
-    fclose(target);
+	size_t end = fread((void*) batch, 1, 8192, target);
+	for (int i = 0; i < end / 16; i++){
+		encrypt_data(&batch[i*16], key, k_len);
+	}
+	encrypt_data(&batch[end - 15], key, k_len);
+  fwrite((void*)batch, 1, end, enc_cp);	
+  fclose(target);
 	fclose(enc_cp);
 	return destination;
 }
@@ -103,19 +106,22 @@ char* decrypt_file(char* file, char* destination, char* key, size_t k_len){
         return NULL;    
     }
 	long max = f_len(file);
-	long batches = max - 16 - (max % 16);
-	char batch[16 + (max % 16)];
+	long batches = max - 8192 - 16;
+	char batch[8192];
 	long i = 0;
 	while (i < batches){
-			i += 16;
-			fread((void*) batch, 1, 16, target);
-			decrypt_data(batch, key, k_len);
-			fwrite((void*)batch, 1, 16, dec_cp);
+			i += fread((void*) batch, 1, 8192, target);
+			for (int i = 0; i < 512; i++){
+				decrypt_data(&batch[i*16], key, k_len);
+			}
+			fwrite((void*)batch, 1, 8192, dec_cp);
 	}
-	fread((void*) batch, 1, 16 + (max % 16), target);
-	decrypt_data(&batch[16 + (max % 16) - 16], key, k_len);
-	decrypt_data(batch, key, k_len);
-    fwrite((void*)batch, 1,16 + (max % 16), dec_cp);
+	size_t end = fread((void*) batch, 1, 8192, target);
+	for (int i = 0; i < end / 16; i++){
+		decrypt_data(&batch[i*16], key, k_len);
+	}
+	decrypt_data(&batch[end - 15], key, k_len);
+  fwrite((void*)batch, 1, end, dec_cp);
 	fclose(target);
 	fclose(dec_cp);
 	return destination;
