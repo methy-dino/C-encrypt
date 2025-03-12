@@ -1,5 +1,6 @@
 #include<stddef.h>
 #include "libs/gal_mult.h"
+#include "libs/swap_tables.h"
 void key_remove(unsigned char* byte_data, char key){
 	for (int i = 15; i > 0; i--){
 		byte_data[i] = byte_data[i] ^ key;
@@ -37,24 +38,28 @@ void col_unshift(unsigned char* byte_data){
 	}
 }
 void decrypt_data(unsigned char* byte_data, unsigned char* key, size_t key_len){
-	for (size_t i = key_len-1; i > 0; i--){
-		key_remove(byte_data, key[i]);
-		for (int i = 3; i > -1; i--){
+    key_remove(byte_data, key[key_len-1]);	
+    for (size_t i = key_len-2; i > 0; i--){
+        for (int i = 3; i > -1; i--){
 			for (int j = i; j > 0; j--){
 				row_unshift(&byte_data[i*4]);	
 			}
+		}		
+        for (int i = 0; i < 16; i++){
+			byte_data[i] = undo_swap[byte_data[i]];
 		}
+        key_remove(byte_data, key[i]);
 		for (int i = 3; i > -1; i--){
 			col_unshift(byte_data);	
 		}
 	}
-  key_remove(byte_data, key[0]);
 	for (int i = 3; i > -1; i--){
 			for (int j = i; j > 0; j--){
 				row_unshift(&byte_data[i*4]);	
 			}	
 	}
-	for (int i = 3; i > -1; i--){
-		col_unshift(byte_data);	
+    for (int i = 0; i < 16; i++){
+		byte_data[i] = undo_swap[byte_data[i]];
 	}
-}
+    key_remove(byte_data, key[0]);
+}   
